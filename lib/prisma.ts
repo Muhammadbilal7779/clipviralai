@@ -1,6 +1,4 @@
 import { PrismaClient } from '@prisma/client'
-import { createClient } from '@libsql/client'
-import { PrismaLibSQL } from '@prisma/adapter-libsql'
 
 declare global {
   var __prisma: PrismaClient | undefined
@@ -14,12 +12,15 @@ function createPrismaClient(): PrismaClient {
   console.log('TURSO_AUTH_TOKEN:', authToken ? 'SET' : 'NOT SET')
 
   if (url && url !== 'undefined') {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { createClient } = require('@libsql/client')
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { PrismaLibSQL } = require('@prisma/adapter-libsql')
     const turso = createClient({ url, authToken: authToken || '' })
     const adapter = new PrismaLibSQL(turso)
-    return new PrismaClient({ adapter } as any)
+    return new PrismaClient({ adapter })
   }
 
-  // Fallback to local SQLite
   console.warn('WARNING: Using local SQLite — data will be lost on restart!')
   return new PrismaClient()
 }
