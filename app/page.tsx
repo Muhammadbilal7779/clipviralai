@@ -251,7 +251,7 @@ export default function Home() {
           </div>
           <div style={{display:'flex',alignItems:'center',gap:12}}>
             <span style={{fontSize:13,color:s.muted}}>{user?.name}</span>
-            <span style={{background:sub?.plan==='pro'?'#13112a':'#1a1a2e',border:`1px solid ${sub?.plan==='pro'?s.purple:'#333'}`,borderRadius:100,padding:'3px 12px',fontSize:12,color:sub?.plan==='pro'?s.lightPurple:'#666'}}>
+            <span style={{background:sub?.plan==='pro'?'#13112a':'#1a1a2e',border:`1px solid ${user?.isAdmin?s.purple:'#333'}`,borderRadius:100,padding:'3px 12px',fontSize:12,color:sub?.plan==='pro'?s.lightPurple:'#666'}}>
               {user?.isAdmin ? '👑 Admin' : sub?.plan==='pro' ? `⚡ Pro • ${sub?.shortsLeft} left` : '🆓 Free'}
             </span>
             <button onClick={handleLogout} style={{...oBtn,padding:'6px 12px',fontSize:12,display:'flex',alignItems:'center',gap:4}}><LogOut size={12}/> Logout</button>
@@ -280,9 +280,9 @@ export default function Home() {
                 <div style={{fontSize:20}}>⚡</div>
                 <div style={{flex:1}}>
                   <span style={{color:s.lightPurple,fontWeight:600}}>
-                    {sub?.plan==='pro'
-                      ?`user?.isAdmin ? 'Admin Account — Unlimited Access 👑' : `Pro Plan Active — ${sub?.shortsLeft}/8 shorts remaining this week``
-                      :'Free Plan — 2 shorts per week'}
+                    {user?.isAdmin
+                      ? 'Admin Account — Unlimited Access 👑'
+                      : sub?.plan==='pro' ? `Pro Plan Active — ${sub?.shortsLeft}/8 shorts remaining this week` : 'Free Plan — 2 shorts per week'}
                   </span>
                 </div>
                 {!user?.isAdmin && sub?.plan!=='pro'&&<button onClick={()=>setPage('pricing')} style={{...pBtn,padding:'6px 14px',fontSize:12}}>Upgrade for $1 →</button>}
