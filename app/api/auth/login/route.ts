@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const { email, password } = await request.json()
     const user = await db.findUserByEmail(email)
     if (!user || !(await comparePassword(password, user.password)))
-      return NextResponse.json({ error: 'Email ya password galat hai' }, { status: 401 })
+      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
 
     const sub = await db.findSubByUserId(user.id)
     const token = signToken({ userId: user.id, email: user.email })

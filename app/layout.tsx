@@ -3,7 +3,7 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'ClipViralAI — Viral Shorts Generator',
-  description: 'Koi bhi video ko viral shorts mein badlein. Sirf $1 mein 8 shorts!',
+  description: 'Turn any video into viral shorts. Just $1 for 8 shorts per week!',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

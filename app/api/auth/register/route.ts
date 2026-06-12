@@ -6,9 +6,9 @@ export async function POST(request: NextRequest) {
   try {
     const { name, email, password } = await request.json()
     if (!name || !email || !password)
-      return NextResponse.json({ error: 'Sab fields fill karein' }, { status: 400 })
+      return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
     if (await db.findUserByEmail(email))
-      return NextResponse.json({ error: 'Email pehle se registered hai' }, { status: 400 })
+      return NextResponse.json({ error: 'This email is already registered' }, { status: 400 })
 
     const hashed = await hashPassword(password)
     const user = await db.createUser({ name, email, password: hashed })
