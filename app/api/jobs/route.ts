@@ -15,11 +15,11 @@ export async function POST(request: NextRequest) {
 
   try {
     const { videoUrl, style, count } = await request.json()
-    if (!videoUrl) return NextResponse.json({ error: 'Please enter a video URL' }, { status: 400 })
+    if (!videoUrl) return NextResponse.json({ error: 'Video URL daalna zaruri hai' }, { status: 400 })
 
     const sub = await db.findSubByUserId(decoded.userId)
     if (!sub || sub.shortsLeft < count)
-      return NextResponse.json({ error: `You only have ${sub?.shortsLeft || 0} shorts remaining. Please upgrade your plan!` }, { status: 403 })
+      return NextResponse.json({ error: `Sirf ${sub?.shortsLeft || 0} shorts bachi hain. Plan upgrade karein!` }, { status: 403 })
 
     const platform = videoUrl.includes('tiktok') ? 'tiktok' : videoUrl.includes('youtu') ? 'youtube' : 'other'
     const job = await db.createJob({ userId: decoded.userId, videoUrl, platform, style, count })

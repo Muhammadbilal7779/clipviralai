@@ -25,8 +25,9 @@ export async function downloadVideo(url: string, outputDir: string, jobId: strin
   const finalPath = path.join(outputDir, `${jobId}_original.mp4`)
   const cmd = `yt-dlp -f "best[ext=mp4]/best" --no-playlist --merge-output-format mp4 -o "${outputPath}" "${url}" 2>&1`
   await execAsync(cmd, { timeout: 300000 })
+  // Find the downloaded file
   const files = fs.readdirSync(outputDir).filter(f => f.startsWith(`${jobId}_original`))
-  if (files.length === 0) throw new Error('Video download failed')
+  if (files.length === 0) throw new Error('Video download fail ho gaya')
   const actualFile = path.join(outputDir, files[0])
   if (actualFile !== finalPath) fs.renameSync(actualFile, finalPath)
   return finalPath
@@ -41,40 +42,11 @@ export async function getVideoDuration(videoPath: string): Promise<number> {
 
 export function generateCaption(style: string, index: number): string {
   const captions: Record<string, string[]> = {
-    'Viral Hook': [
-      '🔥 You won\'t believe what happens next!',
-      '⚡ Nobody talks about this secret...',
-      '😱 Wait for it... 🤯',
-      '🎯 This changed everything!',
-      '💥 POV: You\'re seeing this for the first time',
-      '🚀 This is insane!',
-      '👀 Stop scrolling — watch this',
-      '💡 This will blow your mind',
-    ],
-    'Funny': [
-      '😂 I could not stop laughing!',
-      '🤣 Bro is so serious 💀',
-      '😭 Why is this so relatable lol',
-      '💀 I am done 😂',
-    ],
-    'Educational': [
-      '💡 Did you know this?',
-      '📚 Learn this in 1 minute!',
-      '🧠 Mind = blown after this',
-      '📖 Save this for later!',
-    ],
-    'Motivational': [
-      '💪 Change your life starting today!',
-      '🚀 Your first step toward success',
-      '🔑 This is the secret to success',
-      '🏆 Winners do this every day',
-    ],
-    'News': [
-      '📰 Breaking: Nobody expected this',
-      '🔴 LIVE: Everything just changed',
-      '🌍 The biggest story today',
-      '⚡ This is happening right now',
-    ],
+    'Viral Hook': ['🔥 Yeh dekh ke dimag ghoom jayega!', '⚡ Koi nahi batata yeh secret...', '😱 Wait for it... 🤯', '🎯 This changed everything!', '💥 POV: Pehli baar dekh rahe ho'],
+    'Funny': ['😂 Main rok nahi saka hansne se!', '🤣 Yeh banda serious hai bhai!', '😭 Why is this so relatable lol'],
+    'Educational': ['💡 Kya aap yeh jaante the?', '📚 1 minute mein seekhein!', '🧠 Mind = blown after this'],
+    'Motivational': ['💪 Apni life badlo aaj se!', '🚀 Success ki taraf pehla qadam', '🔑 Yahi hai success ka secret'],
+    'News': ['📰 Breaking: Yeh toh kisi ne expect nahi kiya', '🔴 LIVE: Sab kuch badal gaya', '🌍 Aaj ki sab se bari khabar'],
   }
   const key = Object.keys(captions).find(k => style.toLowerCase().includes(k.toLowerCase())) || 'Viral Hook'
   const list = captions[key]
@@ -82,6 +54,7 @@ export function generateCaption(style: string, index: number): string {
 }
 
 export async function cutShort(videoPath: string, startTime: number, duration: number, outputPath: string): Promise<void> {
+  // 9:16 vertical format for Shorts/TikTok
   const cmd = `ffmpeg -y -ss ${startTime} -i "${videoPath}" -t ${duration} \
     -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1" \
     -c:v libx264 -preset fast -crf 23 -c:a aac -b:a 128k -movflags +faststart \
@@ -105,6 +78,7 @@ export async function processVideo(
   onProgress(30)
   const duration = await getVideoDuration(videoPath)
 
+  // Generate evenly-spaced clip start points, biased toward beginning (more viral)
   const clipDur = style.includes('Educational') ? 55 : style.includes('Funny') ? 20 : 30
   const segments: Array<{start: number; score: number}> = []
   const step = Math.max(1, Math.floor((duration - clipDur) / (count + 1)))
@@ -133,6 +107,7 @@ export async function processVideo(
     onProgress(45 + Math.round((i + 1) / segments.length * 50))
   }
 
+  // Clean up original to save space
   try { fs.unlinkSync(videoPath) } catch {}
 
   onProgress(100)

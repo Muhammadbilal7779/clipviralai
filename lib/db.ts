@@ -20,8 +20,6 @@ export const db = {
         plan: data.plan || 'free',
         shortsLeft: data.shortsLeft ?? 2,
         shortsTotal: data.shortsTotal ?? 2,
-        isActive: true,
-        weekStart: new Date(),
       }
     })
   },
@@ -35,15 +33,13 @@ export const db = {
     return prisma.subscription.upsert({
       where: { userId },
       update: data,
-      create: { userId, plan: 'free', shortsLeft: 2, shortsTotal: 2, isActive: true, weekStart: new Date(), ...data }
+      create: { userId, ...data }
     })
   },
 
   // JOBS
   async createJob(data: { userId: string; videoUrl: string; platform: string; style: string; count: number }) {
-    return prisma.job.create({
-      data: { ...data, status: 'processing', progress: 0 }
-    })
+    return prisma.job.create({ data: { ...data, status: 'processing', progress: 0 } })
   },
   async findJobsByUser(userId: string) {
     return prisma.job.findMany({
@@ -53,10 +49,7 @@ export const db = {
     })
   },
   async findJobById(id: string) {
-    return prisma.job.findUnique({
-      where: { id },
-      include: { shorts: true }
-    })
+    return prisma.job.findUnique({ where: { id }, include: { shorts: true } })
   },
   async updateJob(id: string, updates: any) {
     return prisma.job.update({ where: { id }, data: updates })

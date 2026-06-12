@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   if (!decoded) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { method, transactionId, amount } = await request.json()
   console.log('PAYMENT REQUEST:', { userId: decoded.userId, method, transactionId, amount, time: new Date().toISOString() })
-  return NextResponse.json({ success: true, message: 'Payment request submitted! Admin will activate your plan within 1-2 hours.', reference: `PAY-${Date.now()}` })
+  return NextResponse.json({ success: true, message: 'Payment request receive ho gaya! Admin 1-2 ghante mein approve karega.', reference: `PAY-${Date.now()}` })
 }
 
 export async function PATCH(request: NextRequest) {
