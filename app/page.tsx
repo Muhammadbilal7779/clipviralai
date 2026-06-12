@@ -252,7 +252,7 @@ export default function Home() {
           <div style={{display:'flex',alignItems:'center',gap:12}}>
             <span style={{fontSize:13,color:s.muted}}>{user?.name}</span>
             <span style={{background:sub?.plan==='pro'?'#13112a':'#1a1a2e',border:`1px solid ${sub?.plan==='pro'?s.purple:'#333'}`,borderRadius:100,padding:'3px 12px',fontSize:12,color:sub?.plan==='pro'?s.lightPurple:'#666'}}>
-              {sub?.plan==='pro'?`⚡ Pro • ${sub?.shortsLeft} left`:'🆓 Free'}
+              {user?.isAdmin ? '👑 Admin' : sub?.plan==='pro' ? `⚡ Pro • ${sub?.shortsLeft} left` : '🆓 Free'}
             </span>
             <button onClick={handleLogout} style={{...oBtn,padding:'6px 12px',fontSize:12,display:'flex',alignItems:'center',gap:4}}><LogOut size={12}/> Logout</button>
           </div>
@@ -262,7 +262,7 @@ export default function Home() {
             {k:'dashboard',l:'📊 Dashboard'},
             {k:'generate',l:'⚡ Create Shorts'},
             {k:'shorts',l:'🎬 My Shorts'},
-            {k:'pricing',l:'💳 Plans'},
+            ...(!user?.isAdmin?[{k:'pricing',l:'💳 Plans'}]:[]),
             ...(user?.isAdmin?[{k:'admin',l:'👑 Admin'}]:[])
           ].map(t=>(
             <button key={t.k} onClick={()=>{setPage(t.k as any);if(t.k==='shorts')loadJobs();if(t.k==='admin')loadAdmin()}} style={{padding:'12px 16px',background:'none',border:'none',cursor:'pointer',fontSize:13,color:page===t.k?s.lightPurple:s.muted,borderBottom:page===t.k?`2px solid ${s.purple}`:'2px solid transparent',fontWeight:page===t.k?600:400,whiteSpace:'nowrap'}}>
@@ -281,11 +281,11 @@ export default function Home() {
                 <div style={{flex:1}}>
                   <span style={{color:s.lightPurple,fontWeight:600}}>
                     {sub?.plan==='pro'
-                      ?`Pro Plan Active — ${sub?.shortsLeft}/8 shorts remaining this week`
+                      ?`user?.isAdmin ? 'Admin Account — Unlimited Access 👑' : `Pro Plan Active — ${sub?.shortsLeft}/8 shorts remaining this week``
                       :'Free Plan — 2 shorts per week'}
                   </span>
                 </div>
-                {sub?.plan!=='pro'&&<button onClick={()=>setPage('pricing')} style={{...pBtn,padding:'6px 14px',fontSize:12}}>Upgrade for $1 →</button>}
+                {!user?.isAdmin && sub?.plan!=='pro'&&<button onClick={()=>setPage('pricing')} style={{...pBtn,padding:'6px 14px',fontSize:12}}>Upgrade for $1 →</button>}
               </div>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:16}}>
                 {[
@@ -364,7 +364,7 @@ export default function Home() {
               {(sub?.shortsLeft||0)===0?(
                 <div style={{background:'#1a1830',border:'1px solid #534AB7',borderRadius:12,padding:20,textAlign:'center'}}>
                   <p style={{color:s.lightPurple,marginBottom:12}}>You have no shorts remaining. Upgrade your plan to continue.</p>
-                  <button onClick={()=>setPage('pricing')} style={{...pBtn,padding:'10px 24px'}}>Upgrade for $1 →</button>
+                  {!user?.isAdmin && <button onClick={()=>setPage('pricing')} style={{...pBtn,padding:'10px 24px'}}>Upgrade for $1 →</button>}
                 </div>
               ):(
                 <button onClick={handleGenerate} disabled={loading} style={{...pBtn,width:'100%',padding:'14px',fontSize:16,opacity:loading?0.7:1}}>
