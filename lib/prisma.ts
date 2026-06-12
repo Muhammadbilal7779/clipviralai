@@ -9,20 +9,31 @@ function createPrismaClient(): PrismaClient {
   const authToken = process.env.TURSO_AUTH_TOKEN
 
   console.log('DB Init — TURSO_DATABASE_URL:', url ? url.substring(0, 30) + '...' : 'NOT SET')
+  console.log('DB Init — authToken length:', authToken ? authToken.length : 0)
 
   if (url) {
-    const { createClient } = require('@libsql/client')
-    const { PrismaLibSQL } = require('@prisma/adapter-libsql')
-    
-    const turso = createClient({
-      url: url,
-      authToken: authToken ?? '',
-    })
-    
-    const adapter = new PrismaLibSQL(turso)
-    return new PrismaClient({ adapter } as any)
+    try {
+      const libsql = require('@libsql/client')
+      const prismaLibsql = require('@prisma/adapter-libsql')
+
+      console.log('libsql exports:', Object.keys(libsql))
+      console.log('prismaLibsql exports:', Object.keys(prismaLibsql))
+
+      const turso = libsql.createClient({
+        url: url,
+        authToken: authToken || undefined,
+      })
+
+      console.log('Turso client created:', turso ? 'yes' : 'no')
+
+      const adapter = new prismaLibsql.PrismaLibSQL(turso)
+      return new PrismaClient({ adapter } as any)
+    } catch (e: any) {
+      console.error('Failed to create Turso client:', e.message)
+    }
   }
 
+  console.warn('Falling back to local SQLite')
   return new PrismaClient()
 }
 
