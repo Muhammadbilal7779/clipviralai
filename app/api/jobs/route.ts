@@ -12,23 +12,18 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const decoded = getUserFromCookie(request)
   if (!decoded) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
   try {
     const { videoUrl, style, count } = await request.json()
-    if (!videoUrl) return NextResponse.json({ error: 'Video URL daalna zaruri hai' }, { status: 400 })
-
+    if (!videoUrl) return NextResponse.json({ error: 'Please enter a video URL' }, { status: 400 })
     const sub = await db.findSubByUserId(decoded.userId)
-    if (!sub || sub.shortsLeft < count)
-      return NextResponse.json({ error: `Sirf ${sub?.shortsLeft || 0} shorts bachi hain. Plan upgrade karein!` }, { status: 403 })
-
+    const shortsLeft = Number(sub?.shortsLeft || 0)
+    if (!sub || shortsLeft < count)
+      return NextResponse.json({ error: `You only have ${shortsLeft} shorts remaining. Please upgrade!` }, { status: 403 })
     const platform = videoUrl.includes('tiktok') ? 'tiktok' : videoUrl.includes('youtu') ? 'youtube' : 'other'
     const job = await db.createJob({ userId: decoded.userId, videoUrl, platform, style, count })
-    await db.updateSub(decoded.userId, { shortsLeft: sub.shortsLeft - count })
-
-    // Process in background
-    processInBackground(job.id, videoUrl, style, count)
-
-    return NextResponse.json({ job, message: 'Processing shuru ho gaya!' })
+    await db.updateSub(decoded.userId, { shortsLeft: shortsLeft - count })
+    processInBackground(String(job.id), videoUrl, style, count)
+    return NextResponse.json({ job, message: 'Processing started!' })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })
   }

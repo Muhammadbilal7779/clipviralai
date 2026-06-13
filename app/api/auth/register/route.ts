@@ -6,16 +6,17 @@ export async function POST(request: NextRequest) {
   try {
     const { name, email, password } = await request.json()
     if (!name || !email || !password)
-      return NextResponse.json({ error: 'Sab fields fill karein' }, { status: 400 })
+      return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
     if (await db.findUserByEmail(email))
-      return NextResponse.json({ error: 'Email pehle se registered hai' }, { status: 400 })
+      return NextResponse.json({ error: 'This email is already registered' }, { status: 400 })
 
     const hashed = await hashPassword(password)
     const user = await db.createUser({ name, email, password: hashed })
-    const sub = await db.createSubscription({ userId: user.id })
-    const token = signToken({ userId: user.id, email: user.email })
+    const sub = await db.createSubscription({ userId: String(user.id) })
+    const token = signToken({ userId: String(user.id), email: String(user.email) })
+    const isAdmin = email === 'admin@clipviralai.com' || email === process.env.ADMIN_EMAIL
 
-    const res = NextResponse.json({ success: true, user: { id: user.id, name: user.name, email: user.email, subscription: sub, isAdmin: email === 'admin@clipviralai.com' } })
+    const res = NextResponse.json({ success: true, user: { id: String(user.id), name: String(user.name), email: String(user.email), subscription: sub, isAdmin } })
     res.cookies.set('token', token, { httpOnly: true, sameSite: 'lax', maxAge: 604800 })
     return res
   } catch (e: any) {

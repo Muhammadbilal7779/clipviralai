@@ -7,6 +7,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   if (!decoded) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await params
   const job = await db.findJobById(id)
-  if (!job || job.userId !== decoded.userId) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (!job || String(job.userId) !== decoded.userId) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   return NextResponse.json({ job })
 }

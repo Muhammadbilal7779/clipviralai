@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   if (!decoded) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const user = await db.findUserById(decoded.userId)
   if (!user) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-  const sub = await db.findSubByUserId(user.id)
-  const isAdmin = user.email === 'admin@clipviralai.com' || user.email === process.env.ADMIN_EMAIL
-  return NextResponse.json({ user: { id: user.id, name: user.name, email: user.email, subscription: sub, isAdmin } })
+  const sub = await db.findSubByUserId(String(user.id))
+  const isAdmin = String(user.email) === 'admin@clipviralai.com' || String(user.email) === process.env.ADMIN_EMAIL
+  return NextResponse.json({ user: { id: String(user.id), name: String(user.name), email: String(user.email), subscription: sub, isAdmin } })
 }
