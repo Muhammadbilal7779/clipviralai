@@ -6,13 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start -p ${PORT:-8080}",
-    "lint": "eslint",
-    "postinstall": "prisma generate"
+    "lint": "eslint"
   },
   "dependencies": {
     "@libsql/client": "^0.17.3",
-    "@prisma/adapter-libsql": "^6.0.0",
-    "@prisma/client": "^6.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/uuid": "^10.0.0",
@@ -32,7 +29,6 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
     "postcss": "^8",
-    "prisma": "^6.0.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
